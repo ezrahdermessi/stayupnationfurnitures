@@ -8,6 +8,11 @@ from pathlib import Path
 import os
 import dj_database_url
 
+print(f"=== ENV CHECK ===")
+print(f"DATABASE_URL: {os.environ.get('DATABASE_URL', 'NOT SET')[:50] if os.environ.get('DATABASE_URL') else 'NOT SET'}")
+print(f"DB_HOST: {os.environ.get('DB_HOST', 'NOT SET')}")
+print(f"================")
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -121,13 +126,25 @@ DATABASES = {
     )
 }
 
-db_url = os.environ.get("DATABASE_URL") or os.environ.get("DATABASE_PUBLIC_URL")
+db_url = (
+    os.environ.get("DATABASE_URL") 
+    or os.environ.get("DATABASE_PUBLIC_URL")
+    or os.environ.get("POSTGRES_URL")
+)
 if db_url:
     DATABASES["default"] = dj_database_url.parse(db_url)
 
-# Print for debugging
-print(f"DB Name: {DATABASES['default']['NAME']}")
+db_host = os.environ.get("PGHOST") or os.environ.get("DB_HOST")
+if db_host:
+    DATABASES["default"]["HOST"] = db_host
+    DATABASES["default"]["NAME"] = os.environ.get("PGDATABASE") or os.environ.get("DB_NAME") or "railway"
+    DATABASES["default"]["USER"] = os.environ.get("PGUSER") or os.environ.get("DB_USER") or "postgres"
+    DATABASES["default"]["PASSWORD"] = os.environ.get("PGPASSWORD") or os.environ.get("DB_PASSWORD") or ""
+    DATABASES["default"]["PORT"] = os.environ.get("PGPORT") or os.environ.get("DB_PORT") or "5432"
+
 print(f"DB Host: {DATABASES['default']['HOST']}")
+print(f"DB Name: {DATABASES['default']['NAME']}")
+print(f"DB User: {DATABASES['default']['USER']}")
 
 
 AUTH_PASSWORD_VALIDATORS = [
