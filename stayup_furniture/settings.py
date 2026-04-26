@@ -114,26 +114,16 @@ TEMPLATES = [
 WSGI_APPLICATION = "stayup_furniture.wsgi.application"
 
 
-DATABASE_URL = env("DATABASE_URL", "")
-if DATABASE_URL:
-    DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            ssl_require=not DEBUG,
-        )
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get('DB_NAME') or os.environ.get('POSTGRES_DB', 'railway'),
+        "USER": os.environ.get('DB_USER') or os.environ.get('POSTGRES_USER', 'postgres'),
+        "PASSWORD": os.environ.get('DB_PASSWORD') or os.environ.get('POSTGRES_PASSWORD', ''),
+        "HOST": os.environ.get('DB_HOST') or os.environ.get('POSTGRES_HOST', 'localhost'),
+        "PORT": os.environ.get('DB_PORT') or os.environ.get('POSTGRES_PORT', '5432'),
     }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": env("DB_NAME"),
-            "USER": env("DB_USER"),
-            "PASSWORD": env("DB_PASSWORD"),
-            "HOST": env("DB_HOST", "localhost"),
-            "PORT": env("DB_PORT", "5432"),
-        }
-    }
+}
 
 
 AUTH_PASSWORD_VALIDATORS = [
