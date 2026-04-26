@@ -115,14 +115,10 @@ WSGI_APPLICATION = "stayup_furniture.wsgi.application"
 
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get('DB_NAME') or os.environ.get('POSTGRES_DB') or 'railway',
-        "USER": os.environ.get('DB_USER') or os.environ.get('POSTGRES_USER') or 'postgres',
-        "PASSWORD": os.environ.get('DB_PASSWORD') or os.environ.get('POSTGRES_PASSWORD') or '',
-        "HOST": os.environ.get('DB_HOST') or os.environ.get('POSTGRES_HOST') or 'localhost',
-        "PORT": os.environ.get('DB_PORT') or os.environ.get('POSTGRES_PORT') or '5432',
-    }
+    "default": dj_database_url.config(
+        default=f"sqlite:///{BASE_DIR}/db.sqlite3",
+        engine="django.db.backends.postgresql",
+    )
 }
 
 # Print for debugging
