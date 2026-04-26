@@ -44,7 +44,7 @@ else:
     CSRF_ALLOW_ALL_ORIGINS = False
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=not DEBUG, cast=bool)
+SECURE_SSL_REDIRECT = os.environ.get('SECURE_SSL_REDIRECT', 'False').strip().lower() in ('true', '1', 'yes')
 
 
 # Application definition
@@ -91,18 +91,26 @@ TEMPLATES = [
         },
     },
 ]
+        from pathlib import Path
+        from decouple import config
+        from django.contrib import admin
+        import dj_database_url
 
-WSGI_APPLICATION = 'stayup_furniture.wsgi.application'
+        # Build paths inside the project like this: BASE_DIR / 'subdir'.
+        BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-database_url = config('DATABASE_URL', default='')
-
-if database_url:
-    DATABASES = {
-        'default': dj_database_url.parse(
+        SECRET_KEY = config('SECRET_KEY', default='django-insecure-any-random-secret-key-here')
+        DEBUG = config('DEBUG', default=False, cast=bool)
+        ALLOWED_HOSTS = [
+            host.strip()
+            for host in config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+            if host.strip()
+        ]
+        CSRF_TRUSTED_ORIGINS = [
+            origin.strip()
+            for origin in config('CSRF_TRUSTED_ORIGINS', default='').split(',')
+            if origin.strip()
+        ]
             database_url,
             conn_max_age=600,
             ssl_require=not DEBUG,
@@ -125,7 +133,7 @@ else:
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
+        SECURE_SSL_REDIRECT = config('SECURE_SSL_REDIRECT', default=not DEBUG, cast=bool)
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
     },
     {
