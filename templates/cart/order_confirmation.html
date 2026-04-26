@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Order Confirmed - Stayup Nation Furniture{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-lg-10">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-check-circle fa-4x text-success mb-3"></i>
+                        <h1 class="mb-2">Order Confirmed!</h1>
+                        <p class="text-muted">Thank you for your order. Please complete payment to confirm your order.</p>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="bg-light rounded-3 p-4 h-100">
+                                <h4 class="mb-3"><i class="fas fa-receipt text-primary me-2"></i>Order Details</h4>
+                                <div class="mb-3">
+                                    <span class="text-muted small">Order Number</span>
+                                    <h3 class="text-primary fw-bold mb-0">{{ order_number }}</h3>
+                                </div>
+                                <p class="mb-0 small text-muted">
+                                    <i class="fas fa-envelope me-1"></i> Check your email for order confirmation<br>
+                                    <i class="fas fa-phone me-1"></i> We'll contact you to confirm delivery
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="bg-success bg-opacity-10 rounded-3 p-4 h-100">
+                                <h4 class="mb-3"><i class="fas fa-mobile-alt text-success me-2"></i>Pay via M-Pesa</h4>
+                                <p class="mb-2">Send payment to:</p>
+                                <div class="fs-4 fw-bold mb-3">+255 700 123 456</div>
+                                <p class="small text-muted mb-0">
+                                    <strong>How to pay:</strong><br>
+                                    1. Go to M-Pesa menu<br>
+                                    2. Select "Lipa na M-Pesa"<br>
+                                    3. Choose "Buy Goods and Services"<br>
+                                    4. Enter Till Number: <strong>123456</strong><br>
+                                    5. Enter Amount and confirm
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="bg-light rounded-3 p-4">
+                                <h4 class="mb-3"><i class="fas fa-university text-primary me-2"></i>Pay via Bank Transfer</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Bank:</strong> CRDB Bank</p>
+                                        <p class="mb-1"><strong>Account Name:</strong> Stayup Nation Furniture</p>
+                                        <p class="mb-0"><strong>Account Number:</strong> 0123456789012</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p class="mb-1"><strong>Bank:</strong> NMB Bank</p>
+                                        <p class="mb-1"><strong>Account Name:</strong> Stayup Nation Furniture</p>
+                                        <p class="mb-0"><strong>Account Number:</strong> 2100987654321</p>
+                                    </div>
+                                </div>
+                                <div class="alert alert-warning mt-3 mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Important:</strong> After making payment, send proof of payment (screenshot or receipt) to WhatsApp: +255 700 123 456 or email: payments@stayupfurniture.com
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="text-center">
+                                <h5 class="mb-3"><i class="fas fa-truck text-primary me-2"></i>Delivery Information</h5>
+                                <p class="text-muted mb-0">
+                                    We deliver within 5-7 business days after payment confirmation.<br>
+                                    Our team will contact you to confirm your delivery address and preferred delivery time.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex flex-column flex-sm-row gap-3 justify-content-center">
+                        {% if user.is_authenticated %}
+                            <a href="{% url 'users:orders' %}" class="btn btn-primary btn-lg">
+                                <i class="fas fa-list me-2"></i>View My Orders
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'store:home' %}" class="btn btn-outline-primary btn-lg">
+                            <i class="fas fa-home me-2"></i>Continue Shopping
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

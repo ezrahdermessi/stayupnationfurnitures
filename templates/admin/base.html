@@ -1,0 +1,103 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<style>
+    :root {
+        --primary: #2563eb;
+        --primary-dark: #1d4ed8;
+        --primary-light: #dbeafe;
+        --dark: #0f172a;
+        --gray-100: #f1f5f9;
+        --gray-200: #e2e8f0;
+    }
+    
+    body {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    /* Header */
+    #header {
+        background: linear-gradient(135deg, var(--dark) 0%, #1e293b 100%) !important;
+        border: none !important;
+    }
+    
+    #header h1 a {
+        color: white !important;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    /* User tools */
+    .user-tools a {
+        color: rgba(255,255,255,0.8) !important;
+    }
+    
+    .user-tools a:hover {
+        color: white !important;
+    }
+    
+    /* Breadcrumbs */
+    #breadcrumbs {
+        background: white !important;
+        border-bottom: 1px solid var(--gray-200) !important;
+    }
+    
+    /* Content */
+    #content {
+        padding: 20px;
+    }
+    
+    /* Module headers */
+    .module h2, .module caption {
+        background: var(--primary) !important;
+        color: white !important;
+        padding: 10px 15px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    /* Tables */
+    #change-list thead th {
+        background: var(--gray-100) !important;
+        border-bottom: 2px solid var(--gray-200) !important;
+    }
+    
+    #change-list tbody tr:hover {
+        background: var(--primary-light) !important;
+    }
+    
+    /* Buttons */
+    .button, input[type="submit"], .submit-row input {
+        background: var(--primary) !important;
+        border: none !important;
+        border-radius: 6px !important;
+    }
+    
+    .button:hover, input[type="submit"]:hover, .submit-row input:hover {
+        background: var(--primary-dark) !important;
+    }
+    
+    /* Forms */
+    input[type="text"], input[type="password"], input[type="email"], textarea, select {
+        border: 2px solid var(--gray-200) !important;
+        border-radius: 6px !important;
+    }
+    
+    input:focus, textarea:focus, select:focus {
+        border-color: var(--primary) !important;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
+    }
+    
+    /* Login page */
+    #login #header {
+        background: none !important;
+    }
+    
+    #login #content {
+        padding: 40px 20px;
+    }
+</style>
+{% endblock %}

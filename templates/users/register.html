@@ -1,0 +1,174 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Stayup Nation Furniture{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6">
+            <div class="card shadow-lg border-0 rounded-3">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-user-plus fa-3x text-primary mb-3"></i>
+                        <h2 class="mb-1">Create Account</h2>
+                        <p class="text-muted">Join us for a better shopping experience</p>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate class="needs-validation">
+                        {% csrf_token %}
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Username</label>
+                                <input
+                                    type="text"
+                                    name="{{ form.username.name }}"
+                                    class="form-control{% if form.username.errors %} is-invalid{% endif %}"
+                                    value="{{ form.username.value|default_if_none:'' }}"
+                                    placeholder="Choose a username"
+                                    required
+                                >
+                                {% for error in form.username.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    name="{{ form.email.name }}"
+                                    class="form-control{% if form.email.errors %} is-invalid{% endif %}"
+                                    value="{{ form.email.value|default_if_none:'' }}"
+                                    placeholder="you@example.com"
+                                    required
+                                >
+                                {% for error in form.email.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">First name</label>
+                                <input
+                                    type="text"
+                                    name="{{ form.first_name.name }}"
+                                    class="form-control{% if form.first_name.errors %} is-invalid{% endif %}"
+                                    value="{{ form.first_name.value|default_if_none:'' }}"
+                                    placeholder="First name"
+                                    required
+                                >
+                                {% for error in form.first_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Last name</label>
+                                <input
+                                    type="text"
+                                    name="{{ form.last_name.name }}"
+                                    class="form-control{% if form.last_name.errors %} is-invalid{% endif %}"
+                                    value="{{ form.last_name.value|default_if_none:'' }}"
+                                    placeholder="Last name"
+                                    required
+                                >
+                                {% for error in form.last_name.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Password</label>
+                                <div class="position-relative">
+                                    <input
+                                        type="password"
+                                        id="password1-input"
+                                        name="{{ form.password1.name }}"
+                                        class="form-control pe-5{% if form.password1.errors %} is-invalid{% endif %}"
+                                        placeholder="Create a password"
+                                        required
+                                    >
+                                    <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y p-0 me-2 border-0" onclick="togglePassword('password1')" style="text-decoration: none;">
+                                        <i class="fas fa-eye" id="toggle-icon1"></i>
+                                    </button>
+                                </div>
+                                {% for error in form.password1.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                                {% if form.password1.help_text %}
+                                    <small class="text-muted">{{ form.password1.help_text|safe }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Confirm password</label>
+                                <div class="position-relative">
+                                    <input
+                                        type="password"
+                                        id="password2-input"
+                                        name="{{ form.password2.name }}"
+                                        class="form-control pe-5{% if form.password2.errors %} is-invalid{% endif %}"
+                                        placeholder="Repeat your password"
+                                        required
+                                    >
+                                    <button type="button" class="btn btn-link position-absolute top-50 end-0 translate-middle-y p-0 me-2 border-0" onclick="togglePassword('password2')" style="text-decoration: none;">
+                                        <i class="fas fa-eye" id="toggle-icon2"></i>
+                                    </button>
+                                </div>
+                                {% for error in form.password2.errors %}
+                                    <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input type="checkbox" class="form-check-input" id="terms" required>
+                            <label class="form-check-label" for="terms">
+                                I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a>
+                            </label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                Create Account
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4 pt-3 border-top">
+                        <p class="mb-0 text-muted">Already have an account?
+                            <a href="{% url 'users:login' %}" class="text-primary fw-semibold text-decoration-none">Sign in</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword(id) {
+    const passwordInput = document.getElementById(id + '-input');
+    const toggleIcon = document.getElementById('toggle-icon' + (id === 'password1' ? '1' : '2'));
+    if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        toggleIcon.classList.remove('fa-eye');
+        toggleIcon.classList.add('fa-eye-slash');
+    } else {
+        passwordInput.type = 'password';
+        toggleIcon.classList.remove('fa-eye-slash');
+        toggleIcon.classList.add('fa-eye');
+    }
+}
+</script>
+{% endblock %}

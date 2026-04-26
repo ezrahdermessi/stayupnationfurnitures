@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}Page Not Found - Stayup Nation Furniture{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center text-center">
+        <div class="col-12 col-md-6">
+            <div class="mb-5">
+                <h1 class="display-1 text-primary fw-bold">404</h1>
+                <h2 class="mb-3">Page Not Found</h2>
+                <p class="text-muted mb-4">Sorry, the page you're looking for doesn't exist or has been moved.</p>
+            </div>
+            <a href="{% url 'store:home' %}" class="btn btn-primary btn-lg">
+                <i class="fas fa-home me-2"></i>Go to Homepage
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

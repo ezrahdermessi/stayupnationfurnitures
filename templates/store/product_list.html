@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}Products - Stayup Nation Furniture{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Page Header -->
+    <div class="text-center mb-5">
+        <h1 class="section-title">{% if category_slug %}{{ category.name }}{% else %}All Products{% endif %}</h1>
+        {% if query %}
+            <p class="section-subtitle">Search results for "{{ query }}" ({{ page_obj.paginator.count }} products)</p>
+        {% else %}
+            <p class="section-subtitle">{{ page_obj.paginator.count }} products found</p>
+        {% endif %}
+    </div>
+
+    <div class="row">
+        <!-- Sidebar Filters -->
+        <div class="col-lg-3 mb-4">
+            <div class="card border-0 shadow-sm rounded-3">
+                <div class="card-body p-4">
+                    <div class="d-flex align-items-center justify-content-between mb-4">
+                        <h5 class="mb-0 fw-bold"><i class="fas fa-filter me-2 text-primary"></i>Filters</h5>
+                        <a href="{% url 'store:product_list' %}" class="btn btn-sm btn-outline-secondary rounded-pill">Clear</a>
+                    </div>
+                    
+                    <!-- Categories -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3 text-uppercase" style="font-size: 0.75rem; color: #64748b;">Categories</h6>
+                        <div class="vstack gap-2">
+                            <a href="{% url 'store:product_list' %}" class="btn btn-sm {% if not category_slug %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill text-start">
+                                All Products
+                            </a>
+                            {% for cat in categories %}
+                                <a href="?category={{ cat.slug }}" class="btn btn-sm {% if category_slug == cat.slug %}btn-primary{% else %}btn-outline-secondary{% endif %} rounded-pill text-start">
+                                    {{ cat.name }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    
+                    <!-- Price Range -->
+                    <div class="mb-4">
+                        <h6 class="fw-bold mb-3 text-uppercase" style="font-size: 0.75rem; color: #64748b;">Price Range</h6>
+                        <form method="get" id="filter-form">
+                            {% if category_slug %}<input type="hidden" name="category" value="{{ category_slug }}">{% endif %}
+                            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                            <div class="row g-2 mb-3">
+                                <div class="col-6">
+                                    <input type="number" class="form-control form-control-sm" id="min_price" name="min_price" value="{{ min_price }}" min="0" step="10" placeholder="Min">
+                                </div>
+                                <div class="col-6">
+                                    <input type="number" class="form-control form-control-sm" id="max_price" name="max_price" value="{{ max_price }}" min="0" step="10" placeholder="Max">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-sm w-100 rounded-pill">Apply</button>
+                        </form>
+                    </div>
+                    
+                    <!-- Sort -->
+                    <div>
+                        <h6 class="fw-bold mb-3 text-uppercase" style="font-size: 0.75rem; color: #64748b;">Sort By</h6>
+                        <form method="get" id="sort-form">
+                            {% if category_slug %}<input type="hidden" name="category" value="{{ category_slug }}">{% endif %}
+                            {% if query %}<input type="hidden" name="q" value="{{ query }}">{% endif %}
+                            {% if min_price %}<input type="hidden" name="min_price" value="{{ min_price }}">{% endif %}
+                            {% if max_price %}<input type="hidden" name="max_price" value="{{ max_price }}">{% endif %}
+                            <select class="form-select form-select-sm rounded-pill" name="sort" onchange="this.form.submit()">
+                                <option value="-created_at" {% if sort_by == '-created_at' %}selected{% endif %}>Newest First</option>
+                                <option value="price" {% if sort_by == 'price' %}selected{% endif %}>Price: Low to High</option>
+                                <option value="-price" {% if sort_by == '-price' %}selected{% endif %}>Price: High to Low</option>
+                                <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Name: A to Z</option>
+                            </select>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Grid -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="text-muted mb-0">Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} products</p>
+            </div>
+            
+            <div class="row g-4">
+                {% for product in page_obj %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="product-card">
+                        <div class="product-image">
+                            {% if product.images.first %}
+                                <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}">
+                            {% else %}
+                                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;">
+                                    <i class="fas fa-image fa-3x text-muted opacity-25"></i>
+                                </div>
+                            {% endif %}
+                            {% if product.sale_price %}
+                                <span class="product-badge badge-sale">Sale</span>
+                            {% elif product.is_new %}
+                                <span class="product-badge badge-new">New</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-body">
+                            <a href="{% url 'store:product_detail' product.slug %}" class="product-title">{{ product.name }}</a>
+                            {% if product.category %}
+                                <p class="text-muted small mb-2"><i class="fas fa-tag me-1"></i> {{ product.category.name }}</p>
+                            {% endif %}
+                            <div class="product-price">
+                                <span class="price-current">Tsh {{ product.get_display_price }}</span>
+                                {% if product.sale_price %}
+                                    <span class="price-original">Tsh {{ product.price }}</span>
+                                    <span class="price-savings">Save Tsh {{ product.price|add:"-"|add:product.sale_price }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="d-grid gap-2 mt-3">
+                                <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-outline-primary rounded-pill">View Details</a>
+                                {% if user.is_authenticated %}
+                                    {% if product.in_stock %}
+                                        <button class="btn btn-primary rounded-pill add-to-cart-btn" data-product-id="{{ product.id }}">
+                                            <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                        </button>
+                                    {% else %}
+                                        <button class="btn btn-secondary rounded-pill" disabled>Out of Stock</button>
+                                    {% endif %}
+                                {% else %}
+                                    <a href="{% url 'users:login' %}" class="btn btn-primary rounded-pill">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Login to Add
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12 text-center py-5">
+                    <i class="fas fa-search fa-4x text-muted mb-4 opacity-25"></i>
+                    <h4>No products found</h4>
+                    <p class="text-muted mb-4">Try adjusting your filters or search terms</p>
+                    <a href="{% url 'store:product_list' %}" class="btn btn-primary rounded-pill px-4">View All Products</a>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if page_obj.has_other_pages %}
+            <nav class="mt-5">
+                <ul class="pagination justify-content-center gap-2">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link rounded-pill px-4" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                                <i class="fas fa-chevron-left me-1"></i> Previous
+                            </a>
+                        </li>
+                    {% endif %}
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active"><span class="page-link rounded-pill px-4 bg-primary border-primary">{{ num }}</span></li>
+                        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link rounded-pill px-4" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link rounded-pill px-4" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">
+                                Next <i class="fas fa-chevron-right ms-1"></i>
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

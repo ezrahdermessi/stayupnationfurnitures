@@ -1,0 +1,257 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }} - Stayup Nation Furniture{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'store:home' %}"><i class="fas fa-home me-1"></i>Home</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store:product_list' %}">Products</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'store:category' product.category.slug %}">{{ product.category.name }}</a></li>
+            <li class="breadcrumb-item active">{{ product.name }}</li>
+        </ol>
+    </nav>
+
+    <div class="row">
+        <!-- Product Gallery with Carousel -->
+        <div class="col-lg-6 mb-4 mb-lg-0">
+            {% if product.images.count > 1 %}
+            <div id="productCarousel" class="carousel slide shadow-sm rounded-3" data-bs-ride="carousel">
+                <div class="carousel-inner rounded-3">
+                    {% for image in product.images.all %}
+                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                        <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" class="d-block w-100" style="height: 400px; object-fit: cover; background: #f8fafc;">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if product.images.count > 1 %}
+                <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                    <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
+                </button>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+                <div class="p-4 text-center" style="background: #f8fafc;">
+                    {% if product.images.first %}
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="img-fluid rounded-3" style="max-height: 400px; object-fit: contain;">
+                    {% else %}
+                        <div class="d-flex align-items-center justify-content-center rounded-3" style="height: 400px; background: linear-gradient(135deg, #f1f5f9, #e2e8f0);">
+                            <i class="fas fa-image fa-5x text-muted opacity-25"></i>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            {% if product.images.count > 1 %}
+            <div class="thumbnail-images mt-3 d-flex gap-2 overflow-auto pb-2">
+                {% for image in product.images.all %}
+                <div class="thumbnail {% if forloop.first %}active{% endif %}" 
+                     style="width: 70px; height: 70px; min-width: 70px; border-radius: 8px; overflow: hidden; cursor: pointer; border: 2px solid {% if forloop.first %}var(--primary-color){% else %}transparent{% endif %}; transition: border-color 0.3s;"
+                     onclick="goToSlide({{ forloop.counter0 }})">
+                    <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Product Info -->
+        <div class="col-lg-6">
+            <div class="ps-lg-4">
+                <span class="badge bg-success bg-opacity-10 text-success px-3 py-2 rounded-pill mb-3">
+                    <i class="fas fa-check-circle me-1"></i> In Stock
+                </span>
+                
+                <h1 class="fw-bold mb-3" style="font-size: 2rem;">{{ product.name }}</h1>
+                
+                <div class="mb-4">
+                    <span class="display-4 fw-bold text-primary">Tsh {{ product.get_display_price }}</span>
+                    {% if product.sale_price %}
+                        <span class="text-muted text-decoration-line-through fs-4 ms-3">Tsh {{ product.price }}</span>
+                        <span class="badge bg-danger ms-2 rounded-pill px-3 py-2">
+                            <i class="fas fa-tag me-1"></i> Save Tsh {{ product.price|add:"-"|add:product.sale_price }}
+                        </span>
+                    {% endif %}
+                </div>
+
+                <p class="lead text-muted mb-4">{{ product.short_description }}</p>
+
+                <form id="add-to-cart-form" class="mb-4">
+                    <div class="row align-items-center mb-4">
+                        <div class="col-auto">
+                            <label for="quantity" class="form-label fw-semibold">Quantity:</label>
+                        </div>
+                        <div class="col-auto">
+                            <div class="quantity-control">
+                                <button type="button" class="btn btn-outline-secondary rounded-circle btn-decrease" style="width: 40px; height: 40px;">-</button>
+                                <input type="number" name="quantity" id="quantity" class="form-control text-center mx-2" value="1" min="1" max="{{ product.stock_quantity|default:10 }}" style="width: 60px;">
+                                <button type="button" class="btn btn-outline-secondary rounded-circle btn-increase" style="width: 40px; height: 40px;">+</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex flex-wrap gap-3">
+                        {% if user.is_authenticated %}
+                            {% if product.in_stock %}
+                                <button type="button" class="btn btn-primary btn-lg px-5 rounded-pill add-to-cart-btn" data-product-id="{{ product.id }}">
+                                    <i class="fas fa-shopping-cart me-2"></i>Add to Cart
+                                </button>
+                            {% else %}
+                                <button type="button" class="btn btn-secondary btn-lg px-5 rounded-pill" disabled>
+                                    <i class="fas fa-ban me-2"></i>Out of Stock
+                                </button>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'users:login' %}?next={{ request.path }}" class="btn btn-primary btn-lg px-5 rounded-pill">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login to Add to Cart
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                <div class="card border-0 rounded-3 p-4 mb-4" style="background: #f8fafc;">
+                    <h5 class="fw-bold mb-3"><i class="fas fa-star text-primary me-2"></i>Why Choose This?</h5>
+                    <ul class="list-unstyled mb-0">
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> Premium quality materials</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> {{ product.condition|title }} condition</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> We Deliver</li>
+                        <li class="mb-2"><i class="fas fa-check-circle text-success me-2"></i> 30-day return policy</li>
+                        <li class="mb-0"><i class="fas fa-check-circle text-success me-2"></i> 1-year warranty included</li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h6 class="fw-semibold mb-3"><i class="fas fa-share-alt me-2"></i>Share:</h6>
+                    <div class="d-flex gap-2">
+                        <a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="fab fa-pinterest"></i></a>
+                        <a href="#" class="btn btn-outline-primary btn-sm rounded-circle"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <ul class="nav nav-tabs border-0 mb-4" id="productTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill px-4 py-2 me-2" id="description-tab" data-bs-toggle="tab" data-bs-target="#description" type="button" role="tab">
+                        <i class="fas fa-info-circle me-2"></i>Description
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2" id="specifications-tab" data-bs-toggle="tab" data-bs-target="#specifications" type="button" role="tab">
+                        <i class="fas fa-list me-2"></i>Specifications
+                    </button>
+                </li>
+                {% if product.videos.exists %}
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-4 py-2 ms-2" id="videos-tab" data-bs-toggle="tab" data-bs-target="#videos" type="button" role="tab">
+                        <i class="fas fa-video me-2"></i>Videos
+                    </button>
+                </li>
+                {% endif %}
+            </ul>
+            
+            <div class="tab-content" id="productTabsContent">
+                <div class="tab-pane fade show active" id="description" role="tabpanel">
+                    <div class="card border-0 shadow-sm rounded-3 p-4">
+                        <h4 class="fw-bold mb-4">Product Description</h4>
+                        <div class="text-muted lh-lg">{{ product.description|linebreaks }}</div>
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="specifications" role="tabpanel">
+                    <div class="card border-0 shadow-sm rounded-3 p-4">
+                        <h4 class="fw-bold mb-4">Specifications</h4>
+                        {% if product.specifications.exists %}
+                            <table class="table">
+                                <tbody>
+                                    {% for spec in product.specifications.all %}
+                                    <tr>
+                                        <th class="fw-semibold" style="width: 30%;">{{ spec.name }}</th>
+                                        <td>{{ spec.value }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="text-muted mb-0">No specifications available for this product.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if product.videos.exists %}
+                <div class="tab-pane fade" id="videos" role="tabpanel">
+                    <div class="card border-0 shadow-sm rounded-3 p-4">
+                        <h4 class="fw-bold mb-4">Customization Videos</h4>
+                        <div class="row g-4">
+                            {% for video in product.videos.all %}
+                            <div class="col-md-6">
+                                <div class="border rounded-3 p-3 h-100" style="background: #f8fafc;">
+                                    <video class="w-100 rounded-3" controls preload="metadata">
+                                        <source src="{{ video.video.url }}">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    {% if video.title %}
+                                        <div class="mt-2 fw-semibold">{{ video.title }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if related_products %}
+    <div class="row mt-5">
+        <div class="col-12">
+            <div class="text-center mb-4">
+                <h2 class="section-title">Related Products</h2>
+            </div>
+            <div class="row g-4">
+                {% for related_product in related_products %}
+                <div class="col-md-6 col-lg-3">
+                    <div class="product-card">
+                        <div class="product-image">
+                            {% if related_product.images.first %}
+                                <img src="{{ related_product.images.first.image.url }}" alt="{{ related_product.name }}">
+                            {% else %}
+                                <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:#f1f5f9;">
+                                    <i class="fas fa-image fa-3x text-muted opacity-25"></i>
+                                </div>
+                            {% endif %}
+                            {% if related_product.sale_price %}
+                                <span class="product-badge badge-sale">Sale</span>
+                            {% endif %}
+                        </div>
+                        <div class="product-body">
+                            <a href="{% url 'store:product_detail' related_product.slug %}" class="product-title">{{ related_product.name }}</a>
+                            <div class="product-price">
+                                <span class="price-current">Tsh {{ related_product.get_display_price }}</span>
+                            </div>
+                            <a href="{% url 'store:product_detail' related_product.slug %}" class="btn btn-outline-primary rounded-pill w-100">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

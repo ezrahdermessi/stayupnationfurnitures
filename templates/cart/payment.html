@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - Stayup Nation Furniture{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12 mb-4">
+            <h1>Payment Options</h1>
+            <p class="text-muted">Complete your order by choosing a payment method</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Delivery Form -->
+        <div class="col-lg-7 mb-4">
+            <div class="card">
+                <div class="card-body p-4">
+                    <h4 class="mb-3">Delivery Information</h4>
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name *</label>
+                                <input type="text" name="shipping_name" class="form-control" required value="{{ user.get_full_name|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email Address *</label>
+                                <input type="email" name="shipping_email" class="form-control" required value="{{ user.email|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number *</label>
+                                <input type="text" name="shipping_phone" class="form-control" required value="{{ user.phone|default:'' }}" placeholder="+255 xxx xxx xxx">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Street Address *</label>
+                                <textarea name="shipping_address" class="form-control" rows="2" required>{% if profile %}{{ profile.address }}{% endif %}</textarea>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">City *</label>
+                                <input type="text" name="shipping_city" class="form-control" required value="{% if profile %}{{ profile.city }}{% endif %}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">State / Region</label>
+                                <input type="text" name="shipping_state" class="form-control" value="{% if profile %}{{ profile.state }}{% endif %}">
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Postal Code</label>
+                                <input type="text" name="shipping_postal_code" class="form-control" value="{% if profile %}{{ profile.postal_code }}{% endif %}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Country *</label>
+                                <input type="text" name="shipping_country" class="form-control" required value="{% if profile %}{{ profile.country }}{% else %}Tanzania{% endif %}">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Order Notes (Optional)</label>
+                                <textarea name="notes" class="form-control" rows="3" placeholder="Delivery notes, access instructions, etc."></textarea>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <h4 class="mb-3">Choose Payment Method</h4>
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    <strong>Important:</strong> For online card payments, click "Pay with Card" after filling your details.
+                                </div>
+                            </div>
+                            
+                            <!-- Pay Online (Card/M-Pesa) -->
+                            <div class="col-md-6">
+                                <div class="card border-primary h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-credit-card fa-3x text-primary mb-3"></i>
+                                        <h5>Pay Online</h5>
+                                        <p class="text-muted small">Pay with Visa, Mastercard, or M-Pesa</p>
+                                        <button type="submit" formaction="{% url 'cart:initiate_payment' %}" class="btn btn-primary w-100">
+                                            <i class="fas fa-lock me-2"></i>Pay with Card
+                                        </button>
+                                        <small class="text-muted d-block mt-2">Powered by PayStack</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Manual Payment (M-Pesa/Bank) -->
+                            <div class="col-md-6">
+                                <div class="card border-success h-100">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-mobile-alt fa-3x text-success mb-3"></i>
+                                        <h5>Pay Later</h5>
+                                        <p class="text-muted small">Send payment manually via M-Pesa or Bank</p>
+                                        <button type="submit" formaction="{% url 'cart:manual_order_create' %}" class="btn btn-success w-100">
+                                            <i class="fas fa-money-bill me-2"></i>Manual Payment
+                                        </button>
+                                        <small class="text-muted d-block mt-2">You'll see payment details after</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4">
+                            <a href="{% url 'cart:cart_detail' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Back to Cart
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="col-lg-5">
+            <div class="cart-summary">
+                <h4 class="mb-3">Order Summary</h4>
+
+                {% for item in cart_items %}
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <strong>{{ item.product.name }}</strong>
+                        <div class="text-muted small">Qty: {{ item.quantity }}</div>
+                    </div>
+                    <div>
+                        Tsh {{ item.get_total_price }}
+                    </div>
+                </div>
+                {% endfor %}
+
+                <hr>
+
+                <div class="summary-row">
+                    <span>Subtotal:</span>
+                    <span>Tsh {{ cart.get_total_price }}</span>
+                </div>
+                <div class="summary-row">
+                    <span>Delivery:</span>
+                    <span>We Deliver</span>
+                </div>
+                <div class="summary-row">
+                    <span>Total:</span>
+                    <span class="cart-total">Tsh {{ cart.get_total_price }}</span>
+                </div>
+            </div>
+
+            <div class="mt-4 p-4 bg-light rounded-3">
+                <h5 class="mb-3"><i class="fas fa-shield-alt text-primary me-2"></i>Secure Payment</h5>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Your payment details are encrypted</li>
+                    <li class="mb-2"><i class="fas fa-check text-success me-2"></i>Supported: Visa, Mastercard, M-Pesa</li>
+                    <li class="mb-0"><i class="fas fa-check text-success me-2"></i>100% secure transaction</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

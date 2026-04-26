@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Stayup Nation Furniture{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet">
+    <link href="{% static 'css/style.css' %}?v=1.0.1" rel="stylesheet">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="top-bar">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex gap-4">
+                        <a class="top-phone" href="tel:+25569865321"><i class="fas fa-phone me-2"></i>+255-698657321</a>
+                        <a class="top-email" href="mailto:info@stayupfurniture.com"><i class="fas fa-envelope me-2"></i>info@stayupnationfurniture.com</a>
+                    </div>
+                    <div class="top-badge">
+                        <span class="badge" style="background: rgba(255,255,255,0.15); color: white; padding: 6px 16px;">
+                            <i class="fas fa-truck me-1"></i> We Deliver
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <nav class="navbar navbar-expand-lg">
+            <div class="container">
+                <button class="navbar-toggler border-0 me-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <a class="navbar-brand d-flex align-items-center" href="{% url 'store:home' %}">
+                    <img src="{% static 'images/stay up 2.png' %}" alt="Stayup Nation" style="height: 40px; width: auto;">
+                    <span class="brand-text brand-text-sm ms-2 fw-bold d-inline d-sm-none">Stayup Nation</span>
+                    <span class="brand-text brand-text-lg ms-2 fw-bold d-none d-sm-inline">Stayup Nation</span>
+                </a>
+
+                <div class="mobile-actions d-flex d-lg-none align-items-center gap-2 ms-auto">
+                    <div class="dropdown">
+                        <a class="btn-icon" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fas fa-user"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 py-2" style="min-width: 180px;">
+                            {% if user.is_authenticated %}
+                                <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'users:profile' %}"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
+                                <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'users:orders' %}"><i class="fas fa-box me-2"></i>My Orders</a></li>
+                                <li><hr class="dropdown-divider mx-3 my-2"></li>
+                                <li><a class="dropdown-item rounded-2 mx-2 my-1 text-danger" href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                            {% else %}
+                                <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'users:login' %}"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                                <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'users:register' %}"><i class="fas fa-user-plus me-2"></i>Register</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+
+                    <a href="{% url 'cart:cart_detail' %}" class="cart-btn cart-btn--icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge">{{ cart.get_total_items|default:0 }}</span>
+                    </a>
+                </div>
+
+                <form class="search-bar search-bar-mobile d-lg-none" action="{% url 'store:search' %}" method="get">
+                    <input type="search" name="q" placeholder="Search products..." value="{{ request.GET.q }}">
+                    <button type="submit" class="search-btn" aria-label="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                </form>
+                
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'store:home' %}">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">Categories</a>
+                            <ul class="dropdown-menu border-0 shadow-lg rounded-3 py-2">
+                                {% for category in categories %}
+                                    <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'store:category' category.slug %}">{{ category.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'product_list' %}active{% endif %}" href="{% url 'store:product_list' %}">Products</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'store:decoration_list' %}">Decorations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'about' %}active{% endif %}" href="{% url 'store:about' %}">About</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link {% if request.resolver_match.url_name == 'contact' %}active{% endif %}" href="{% url 'store:contact' %}">Contact</a>
+                        </li>
+                    </ul>
+                    
+                    <div class="d-flex align-items-center gap-3 d-none d-lg-flex">
+                        <form class="search-bar search-bar-desktop" action="{% url 'store:search' %}" method="get">
+                            <input type="search" name="q" placeholder="Search products..." value="{{ request.GET.q }}">
+                            <button type="submit" class="search-btn" aria-label="Search">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                        
+                        <div class="dropdown">
+                            <a class="btn-icon" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="fas fa-user"></i>
+                                <span class="d-lg-none ms-2">Account</span>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end border-0 shadow-lg rounded-3 py-2" style="min-width: 180px;">
+                                {% if user.is_authenticated %}
+                                    <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'users:profile' %}"><i class="fas fa-user-circle me-2"></i>My Profile</a></li>
+                                    <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'users:orders' %}"><i class="fas fa-box me-2"></i>My Orders</a></li>
+                                    <li><hr class="dropdown-divider mx-3 my-2"></li>
+                                    <li><a class="dropdown-item rounded-2 mx-2 my-1 text-danger" href="{% url 'users:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                                {% else %}
+                                    <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'users:login' %}"><i class="fas fa-sign-in-alt me-2"></i>Login</a></li>
+                                    <li><a class="dropdown-item rounded-2 mx-2 my-1" href="{% url 'users:register' %}"><i class="fas fa-user-plus me-2"></i>Register</a></li>
+                                {% endif %}
+                            </ul>
+                        </div>
+
+                        <a href="{% url 'cart:cart_detail' %}" class="cart-btn">
+                            <i class="fas fa-shopping-cart"></i>
+                            <span class="cart-badge">{{ cart.get_total_items|default:0 }}</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mt-4">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {% if message.tags == 'success' %}<i class="fas fa-check-circle me-2"></i>
+                    {% elif message.tags == 'error' %}<i class="fas fa-exclamation-circle me-2"></i>
+                    {% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row g-4 py-5">
+                <div class="col-lg-4">
+                    <div class="footer-brand">
+                        <i class="fas fa-couch"></i> Stayup Nation Furniture
+                    </div>
+                    <p>Transform your living space with our premium furniture collection. Quality, comfort, and style delivered to your doorstep.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                
+                <div class="col-6 col-lg-2">
+                    <h5>Quick Links</h5>
+                    <ul>
+                        <li><a href="{% url 'store:home' %}">Home</a></li>
+                        <li><a href="{% url 'store:product_list' %}">Products</a></li>
+                        <li><a href="{% url 'store:about' %}">About Us</a></li>
+                        <li><a href="{% url 'store:contact' %}">Contact</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-6 col-lg-3">
+                    <h5>Customer Service</h5>
+                    <ul>
+                        <li><a href="#">Delivery Info</a></li>
+                        <li><a href="#">Returns</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div class="col-12 col-lg-3">
+                    <h5>Newsletter</h5>
+                    <p>Subscribe to get special offers and exclusive updates.</p>
+                    <form class="newsletter-form d-flex gap-2">
+                        <input type="email" class="form-control" placeholder="Your email">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="container text-center">
+                <p class="mb-0" style="color: rgba(255,255,255,0.5);">&copy; 2026 Stayup Nation Furniture. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{% static 'js/main.js' %}?v=1.0.1"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

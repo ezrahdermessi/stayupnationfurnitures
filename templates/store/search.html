@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results - Stayup Nation Furniture{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-12">
+            <h1>Search Results</h1>
+            {% if query %}
+                <p class="text-muted">Searching for "{{ query }}" - {{ results_count }} results found</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="row g-4">
+        {% for product in page_obj %}
+        <div class="col-md-6 col-lg-4">
+            <div class="product-card">
+                <div class="product-image">
+                    {% if product.images.first %}
+                        <img src="{{ product.images.first.image.url }}" alt="{{ product.name }}" class="img-fluid">
+                    {% else %}
+                        <img src="https://via.placeholder.com/300x250/cccccc/666666?text=No+Image" alt="{{ product.name }}" class="img-fluid">
+                    {% endif %}
+                    {% if product.sale_price %}
+                        <span class="product-badge badge-sale">Sale</span>
+                    {% endif %}
+                </div>
+                <div class="product-body">
+                    <a href="{% url 'store:product_detail' product.slug %}" class="product-title">{{ product.name }}</a>
+                    <div class="product-price">
+                        <span class="price-current">Tsh {{ product.get_display_price }}</span>
+                        {% if product.sale_price %}
+                            <span class="price-original">Tsh {{ product.price }}</span>
+                        {% endif %}
+                    </div>
+                    <a href="{% url 'store:product_detail' product.slug %}" class="btn btn-outline-primary w-100">View Details</a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4>No products found</h4>
+            <p class="text-muted">Try searching with different keywords</p>
+            <a href="{% url 'store:product_list' %}" class="btn btn-primary">Browse All Products</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+    <nav aria-label="Product pagination" class="mt-5">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}&q={{ query }}">Previous</a>
+                </li>
+            {% endif %}
+            
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ num }}</span>
+                    </li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ num }}&q={{ query }}">{{ num }}</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+            
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}&q={{ query }}">Next</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}
