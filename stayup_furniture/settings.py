@@ -117,13 +117,17 @@ WSGI_APPLICATION = "stayup_furniture.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get('DB_NAME') or os.environ.get('POSTGRES_DB', 'railway'),
-        "USER": os.environ.get('DB_USER') or os.environ.get('POSTGRES_USER', 'postgres'),
-        "PASSWORD": os.environ.get('DB_PASSWORD') or os.environ.get('POSTGRES_PASSWORD', ''),
-        "HOST": os.environ.get('DB_HOST') or os.environ.get('POSTGRES_HOST', 'localhost'),
-        "PORT": os.environ.get('DB_PORT') or os.environ.get('POSTGRES_PORT', '5432'),
+        "NAME": os.environ.get('DB_NAME') or os.environ.get('POSTGRES_DB') or 'railway',
+        "USER": os.environ.get('DB_USER') or os.environ.get('POSTGRES_USER') or 'postgres',
+        "PASSWORD": os.environ.get('DB_PASSWORD') or os.environ.get('POSTGRES_PASSWORD') or '',
+        "HOST": os.environ.get('DB_HOST') or os.environ.get('POSTGRES_HOST') or 'localhost',
+        "PORT": os.environ.get('DB_PORT') or os.environ.get('POSTGRES_PORT') or '5432',
     }
 }
+
+# Print for debugging
+print(f"DB Name: {DATABASES['default']['NAME']}")
+print(f"DB Host: {DATABASES['default']['HOST']}")
 
 
 AUTH_PASSWORD_VALIDATORS = [
