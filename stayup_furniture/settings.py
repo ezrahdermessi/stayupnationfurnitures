@@ -121,6 +121,10 @@ DATABASES = {
     )
 }
 
+db_url = os.environ.get("DATABASE_URL") or os.environ.get("DATABASE_PUBLIC_URL")
+if db_url:
+    DATABASES["default"] = dj_database_url.parse(db_url)
+
 # Print for debugging
 print(f"DB Name: {DATABASES['default']['NAME']}")
 print(f"DB Host: {DATABASES['default']['HOST']}")
