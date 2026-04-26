@@ -29,3 +29,6 @@ Thumbs.db
 # Environment
 .env
 .env.local
+
+# Node modules (not needed for deployment)
+node_modules/
