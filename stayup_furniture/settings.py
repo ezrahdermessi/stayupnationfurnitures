@@ -117,25 +117,27 @@ WSGI_APPLICATION = "stayup_furniture.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR}/db.sqlite3",
-        engine="django.db.backends.postgresql",
     )
 }
 
 db_url = (
-    os.environ.get("DATABASE_URL") 
+    os.environ.get("DATABASE_URL")
     or os.environ.get("DATABASE_PUBLIC_URL")
     or os.environ.get("POSTGRES_URL")
 )
 if db_url:
     DATABASES["default"] = dj_database_url.parse(db_url)
-
-db_host = os.environ.get("PGHOST") or os.environ.get("DB_HOST") or os.environ.get("PGHOSTNAME")
-if db_host:
-    DATABASES["default"]["HOST"] = db_host
-    DATABASES["default"]["NAME"] = os.environ.get("PGDATABASE") or os.environ.get("DB_NAME") or "railway"
-    DATABASES["default"]["USER"] = os.environ.get("PGUSER") or os.environ.get("DB_USER") or "postgres"
-    DATABASES["default"]["PASSWORD"] = os.environ.get("PGPASSWORD") or os.environ.get("DB_PASSWORD") or ""
-    DATABASES["default"]["PORT"] = os.environ.get("PGPORT") or os.environ.get("DB_PORT") or "5432"
+else:
+    db_host = os.environ.get("PGHOST") or os.environ.get("DB_HOST") or os.environ.get("PGHOSTNAME")
+    if db_host:
+        DATABASES["default"] = {
+            "ENGINE": "django.db.backends.postgresql",
+            "HOST": db_host,
+            "NAME": os.environ.get("PGDATABASE") or os.environ.get("DB_NAME") or "railway",
+            "USER": os.environ.get("PGUSER") or os.environ.get("DB_USER") or "postgres",
+            "PASSWORD": os.environ.get("PGPASSWORD") or os.environ.get("DB_PASSWORD") or "",
+            "PORT": os.environ.get("PGPORT") or os.environ.get("DB_PORT") or "5432",
+        }
 
 
 AUTH_PASSWORD_VALIDATORS = [
