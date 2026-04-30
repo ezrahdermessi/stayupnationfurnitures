@@ -1,2 +1,2 @@
 [deploy]
-startCommand = "python manage.py collectstatic --noinput --clear; python manage.py createsuperuser --noinput --username admin --email admin@stayupnation.com || true; gunicorn stayup_furniture.wsgi:application --bind 0.0.0.0:8080 --timeout 120"
+startCommand = "python manage.py collectstatic --noinput --clear; python manage.py reset_admin; gunicorn stayup_furniture.wsgi:application --bind 0.0.0.0:8080 --timeout 120"
