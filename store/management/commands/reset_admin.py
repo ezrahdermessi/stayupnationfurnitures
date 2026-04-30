@@ -14,6 +14,8 @@ class Command(BaseCommand):
         if User.objects.filter(username=username).exists():
             user = User.objects.get(username=username)
             user.set_password(password)
+            user.is_staff = True
+            user.is_superuser = True
             user.save()
             self.stdout.write(self.style.SUCCESS(f"Password reset for {username}"))
         else:
