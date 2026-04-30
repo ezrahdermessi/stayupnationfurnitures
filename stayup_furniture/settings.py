@@ -30,7 +30,7 @@ def env_int(key, default=0):
 
 
 SECRET_KEY = env("SECRET_KEY", "django-insecure-any-random-secret-key-here")
-DEBUG = env_bool("DEBUG", False)
+DEBUG = env_bool("DEBUG", True)
 
 ALLOWED_HOSTS = [
     host.strip()
@@ -57,15 +57,16 @@ if DEBUG:
     CSRF_COOKIE_SAMESITE = None
     SESSION_COOKIE_SAMESITE = None
     CSRF_ALLOW_ALL_ORIGINS = True
+    SECURE_SSL_REDIRECT = False
 else:
     CSRF_COOKIE_SECURE = True
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SAMESITE = "Lax"
     SESSION_COOKIE_SAMESITE = "Lax"
     CSRF_ALLOW_ALL_ORIGINS = False
+    SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", True)
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", not DEBUG)
 
 
 INSTALLED_APPS = [
