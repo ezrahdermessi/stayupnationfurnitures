@@ -208,7 +208,7 @@ EMAIL_HOST_USER = env("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = env(
     "DEFAULT_FROM_EMAIL",
-    "Stayup Nation Furniture <noreply@stayupfurniture.com>",
+    "Stayup Nation Furniture <stayupnation129@gmail.com>",
 )
 
 ADMIN_URL = "admin/"
