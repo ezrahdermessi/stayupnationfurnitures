@@ -118,10 +118,12 @@ class ProductAdmin(admin.ModelAdmin):
     list_per_page = 25
     
     def admin_thumbnail(self, obj):
-        first_image = obj.images.first()
-        if first_image:
-            from django.utils.html import format_html
-            return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">', first_image.image.url)
+        try:
+            first_image = obj.images.first()
+            if first_image and first_image.image:
+                return format_html('<img src="{}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">', first_image.image.url)
+        except Exception:
+            pass
         return format_html('<img src="/static/admin/img/icon-noimage.svg" style="width: 50px; height: 50px;">')
     admin_thumbnail.short_description = 'Image'
 

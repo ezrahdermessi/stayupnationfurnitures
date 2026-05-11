@@ -27,12 +27,8 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
 ]
 
-# Password reset URLs:
-# - password_reset/          - Submit email form
-# - password_reset/done/     - Success message
-# - reset/<uidb64>/<token>/  - Confirm link from email
-# - reset/done/              - Password changed success
-
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+else:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
