@@ -1,12 +1,15 @@
-from django.shortcuts import render, get_object_or_404
-from django.db.models import Q
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
+from django.db.models import Q, Count
 from django.core.paginator import Paginator
 from django.http import JsonResponse
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 import json
 
-from .models import Product, Category, Review, NewsletterSubscription, Decoration
+from .models import Product, Category, Review, NewsletterSubscription, Decoration, ContactMessage
 
 def home(request):
     featured_products = Product.objects.filter(featured=True, is_active=True)[:8]
@@ -59,6 +62,7 @@ def product_list(request):
     context = {
         'page_obj': page_obj,
         'categories': categories,
+        'category': category if category_slug else None,
         'query': query,
         'category_slug': category_slug,
         'min_price': min_price,
@@ -142,6 +146,22 @@ def search(request):
     }
     return render(request, 'store/search.html', context)
 
+
+def api_search(request):
+    query = request.GET.get('q', '')
+    products = Product.objects.filter(is_active=True, name__icontains=query)[:10]
+    results = [
+        {
+            'id': p.id,
+            'name': p.name,
+            'price': str(p.get_display_price()),
+            'slug': p.slug,
+            'url': reverse('store:product_detail', kwargs={'slug': p.slug}),
+        }
+        for p in products
+    ]
+    return JsonResponse({'results': results})
+
 def about(request):
     return render(request, 'store/about.html')
 
@@ -152,11 +172,11 @@ def contact(request):
         subject = request.POST.get('subject')
         message = request.POST.get('message')
         
-        # Here you would typically send an email or save to database
-        # For now, we'll just show a success message
-        from django.contrib import messages
-        messages.success(request, 'Your message has been sent successfully!')
-        return render(request, 'store/contact.html')
+        ContactMessage.objects.create(
+            name=name, email=email, subject=subject, message=message
+        )
+        messages.success(request, 'Your message has been sent successfully! We will get back to you soon.')
+        return redirect('store:contact')
     
     return render(request, 'store/contact.html')
 
@@ -176,14 +196,8 @@ def add_review(request, slug):
 
     if rating < 1 or rating > 5 or not content:
         messages.error(request, 'Please provide a rating and review text.')
-        return render(request, 'store/product_detail.html', {
-            'product': product,
-            'related_products': Product.objects.filter(
-                category=product.category, is_active=True
-            ).exclude(id=product.id)[:4],
-        })
+        return redirect('store:product_detail', slug=product.slug)
 
-    # Update or create a single review per user/product
     Review.objects.update_or_create(
         product=product,
         user=request.user,
@@ -196,47 +210,7 @@ def add_review(request, slug):
     )
 
     messages.success(request, 'Thank you for reviewing this product!')
-    return render(request, 'store/product_detail.html', {
-        'product': product,
-        'related_products': Product.objects.filter(
-            category=product.category, is_active=True
-        ).exclude(id=product.id)[:4],
-    })
-
-
-def api_search(request):
-    """
-    Lightweight JSON search endpoint used by live search JS.
-    """
-    query = request.GET.get('q', '').strip()
-    results = []
-
-    if query:
-        products = (
-            Product.objects.filter(is_active=True)
-            .filter(
-                Q(name__icontains=query)
-                | Q(short_description__icontains=query)
-                | Q(category__name__icontains=query)
-            )[:10]
-        )
-        for product in products:
-            image = product.images.first()
-            results.append(
-                {
-                    "name": product.name,
-                    "slug": product.slug,
-                    "price": str(product.get_display_price()),
-                    "image": image.image.url if image else "",
-                    "url": request.build_absolute_uri(
-                        product.get_absolute_url()
-                    )
-                    if hasattr(product, "get_absolute_url")
-                    else "",
-                }
-            )
-
-    return JsonResponse({"results": results})
+    return redirect('store:product_detail', slug=product.slug)
 
 
 @require_POST

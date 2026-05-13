@@ -94,7 +94,7 @@ class Command(BaseCommand):
         ]
 
         for prod_data in products_data:
-            category = categories[prod_data.pop('category')
+            category = categories[prod_data.pop('category')]
             product, created = Product.objects.get_or_create(
                 slug=prod_data['slug'],
                 defaults={

@@ -1,6 +1,8 @@
 from django.db import models
+from django.urls import reverse
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 
 User = get_user_model()
 
@@ -51,6 +53,19 @@ class Product(models.Model):
 
     def get_display_price(self):
         return self.sale_price if self.sale_price else self.price
+
+    def get_absolute_url(self):
+        return reverse('store:product_detail', kwargs={'slug': self.slug})
+
+    @property
+    def is_new(self):
+        return self.created_at >= timezone.now() - timezone.timedelta(days=30)
+
+    @property
+    def savings(self):
+        if self.sale_price:
+            return self.price - self.sale_price
+        return 0
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
@@ -177,3 +192,17 @@ class NewsletterSubscription(models.Model):
 
     def __str__(self):
         return self.email
+
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    subject = models.CharField(max_length=300)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.name} - {self.subject}"

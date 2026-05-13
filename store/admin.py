@@ -16,6 +16,7 @@ from .models import (
     DecorationVideo,
     Review,
     NewsletterSubscription,
+    ContactMessage,
 )
 
 admin.site.site_header = "Stayup Nation Seller Dashboard"
@@ -237,6 +238,14 @@ class NewsletterSubscriptionAdmin(admin.ModelAdmin):
     list_display = ('email', 'is_active', 'created_at')
     list_editable = ('is_active',)
     date_hierarchy = 'created_at'
+
+
+@admin.register(ContactMessage)
+class ContactMessageAdmin(admin.ModelAdmin):
+    list_display = ('name', 'email', 'subject', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('name', 'email', 'subject', 'message')
+    readonly_fields = ('name', 'email', 'subject', 'message', 'created_at')
 
 
 @admin.register(ProductSpecification)
