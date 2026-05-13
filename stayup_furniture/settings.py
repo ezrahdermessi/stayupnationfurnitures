@@ -169,23 +169,21 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
-STATICFILES_STORAGE = "whitenoise.storage.CompressedStaticFilesStorage"
 
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+STORAGES = {
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
+
 CLOUDINARY_URL = env("CLOUDINARY_URL", "")
-print(f"CLOUDINARY_URL set: {'Yes' if CLOUDINARY_URL else 'No'}")
 if CLOUDINARY_URL:
     try:
         import cloudinary
         cloudinary.config(cloudinary_url=CLOUDINARY_URL)
         from cloudinary_storage.storage import MediaCloudinaryStorage
-        CLOUDINARY_STORAGE = {
-            "CLOUDINARY_URL": CLOUDINARY_URL,
-        }
-        DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-        print("Cloudinary configured successfully")
+        STORAGES["default"] = {"BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage"}
     except Exception as e:
         print(f"Cloudinary config error: {e}")
 
