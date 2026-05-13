@@ -68,6 +68,15 @@ else:
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    }
+}
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+
 
 INSTALLED_APPS = [
     "jazzmin",
@@ -120,6 +129,8 @@ WSGI_APPLICATION = "stayup_furniture.wsgi.application"
 DATABASES = {
     "default": dj_database_url.config(
         default=f"sqlite:///{BASE_DIR}/db.sqlite3",
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
 
@@ -129,7 +140,7 @@ db_url = (
     or os.environ.get("POSTGRES_URL")
 )
 if db_url:
-    DATABASES["default"] = dj_database_url.parse(db_url)
+    DATABASES["default"] = dj_database_url.parse(db_url, conn_max_age=600, conn_health_checks=True)
 else:
     db_host = os.environ.get("PGHOST") or os.environ.get("DB_HOST") or os.environ.get("PGHOSTNAME")
     if db_host:
@@ -140,6 +151,8 @@ else:
             "USER": os.environ.get("PGUSER") or os.environ.get("DB_USER") or "postgres",
             "PASSWORD": os.environ.get("PGPASSWORD") or os.environ.get("DB_PASSWORD") or "",
             "PORT": os.environ.get("PGPORT") or os.environ.get("DB_PORT") or "5432",
+            "CONN_MAX_AGE": 600,
+            "OPTIONS": {"sslmode": "require"},
         }
 
 
