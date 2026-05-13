@@ -175,13 +175,19 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 CLOUDINARY_URL = env("CLOUDINARY_URL", "")
+print(f"CLOUDINARY_URL set: {'Yes' if CLOUDINARY_URL else 'No'}")
 if CLOUDINARY_URL:
-    import cloudinary
-    cloudinary.config(cloudinary_url=CLOUDINARY_URL)
-    CLOUDINARY_STORAGE = {
-        "CLOUDINARY_URL": CLOUDINARY_URL,
-    }
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+    try:
+        import cloudinary
+        cloudinary.config(cloudinary_url=CLOUDINARY_URL)
+        from cloudinary_storage.storage import MediaCloudinaryStorage
+        CLOUDINARY_STORAGE = {
+            "CLOUDINARY_URL": CLOUDINARY_URL,
+        }
+        DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+        print("Cloudinary configured successfully")
+    except Exception as e:
+        print(f"Cloudinary config error: {e}")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.User"
