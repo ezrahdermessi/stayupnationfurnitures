@@ -4,6 +4,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stayup Nation Furniture - Premium furniture and home decoration. Browse our collection of sofas, beds, dining tables, and more.">
+    <meta name="keywords" content="furniture, home decoration, sofas, beds, dining tables, Tanzania">
+    <meta property="og:title" content="{% block og_title %}Stayup Nation Furniture{% endblock %}">
+    <meta property="og:description" content="Premium furniture and home decoration. Browse our collection today!">
+    <meta property="og:image" content="{% static 'images/stay up 2.png' %}">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.build_absolute_uri }}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Stayup Nation Furniture">
+    <meta name="twitter:description" content="Premium furniture and home decoration.">
+    <meta name="twitter:image" content="{% static 'images/stay up 2.png' %}">
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Stayup Nation Furniture",
+        "url": "https://stayupnationfurnitures.com",
+        "logo": "{% static 'images/stay up 2.png' %}"
+    }
+    </script>
     <title>{% block title %}Stayup Nation Furniture{% endblock %}</title>
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicons/favicon-16x16.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicons/favicon-32x32.png' %}">
